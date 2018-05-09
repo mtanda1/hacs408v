@@ -1,7 +1,7 @@
 import os
 import re
 import csv
-def fuuuuuuuckkkkkkk(csvfile)
+def fuuuuuuuckkkkkkk(csvfile):
 with open(csvfile,'r') as infile, open("complexity.csv", 'w') as outfile:
     #with open("HACS408V-netflow-host1-ssh.txt",'r') as infile, open("cleannetflowh1.csv", 'w') as outfile:   merged-withcounts
     writer = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_MINIMAL)
