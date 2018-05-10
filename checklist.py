@@ -1,26 +1,46 @@
 import os
 import re
 import csv
-def fuckoffconnor(csvfile):
-	with open(csvfile,'r') as infile, open("checklist.csv", 'w') as outfile:
-		#with open("HACS408V-netflow-host1-ssh.txt",'r') as infile, open("cleannetflowh1.csv", 'w') as outfile:   merged-withcounts
-	    writer = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_MINIMAL)
-	    col = ('count'+',' +'password'+',' +'lowercase'+','+'uppercase'+','+'number'+','+'special_char')
-	    writer.writerow(col.split(','))
-	    for line in infile.readlines():
-	        line = line.strip().split('\t')
-	        haslowercase = False
-	        hasuppercase = False
-	        hasnum = False
-	        hasspecial = False
-	        if re.search(r'[a-z]', line[1]):
-	            haslowercase = True
-	        if re.search(r'[A-Z]', line[1]):
-	            hasuppercase = True
-	        if re.search(r'[\d]', line[1]):
-	            hasnum = True
-	        if re.search(r'[\`\~\!\@\#\$\%\^\&\*\(\)\-\_\=\+\|\]\}\[\{\'\"\;\:\/\\\?\.\>\,\<\ ]', line[1]):
-	            hasspecial = True
-	        sub = (line[0]+',' +line[1]+',' +str(haslowercase)+','+str(hasuppercase)+','+str(hasnum)+','+str(hasspecial))
-	        writer.writerow(sub.split(','))
-fuckoffconnor("merged-withcounts.csv")
+import pandas as pd
+
+CORE_DFRAME = None
+
+def load_data(path='../lists/test.csv'):#merged-withcounts.csv
+    global CORE_DFRAME
+
+    CORE_DFRAME = pd.read_csv(path, sep='\t')
+
+def checklist():
+    global CORE_DFRAME
+    #print(CORE_DFRAME)
+    df_check = pd.DataFrame(columns=['count','passwd','haslowercase','hasuppercase','hasnum','hasspecial']) 
+    rows = []
+    #print(CORE_DFRAME)
+    #writer = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_MINIMAL)
+    for row in CORE_DFRAME.itertuples():
+        #print(row)
+        passwd = str(getattr(row, 'passwd'))
+        count = getattr(row, 'count')
+        haslowercase = False
+        hasuppercase = False
+        hasnum = False
+        hasspecial = False
+        if re.search(r'[a-z]', passwd):
+            haslowercase = True
+        if re.search(r'[A-Z]', passwd):
+            hasuppercase = True
+        if re.search(r'[\d]', passwd):
+            hasnum = True
+        if re.search(r'[\`\~\!\@\#\$\%\^\&\*\(\)\-\_\=\+\|\]\}\[\{\'\"\;\:\/\\\?\.\>\,\<\ ]', passwd):
+            hasspecial = True
+        rows.append({'count':count,'passwd':passwd, 'haslowercase':haslowercase,'hasuppercase':hasuppercase,'hasnum':hasnum,'hasspecial':hasspecial})
+    df_check = df_check.append(rows)
+    return(df_check)
+def main():
+    load_data()
+    output_dframe = checklist()
+    print(output_dframe)
+
+main()
+
+
